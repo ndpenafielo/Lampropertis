@@ -1,0 +1,14 @@
+{% include 'admin/cabecera.html' %}
+
+<div class="p-5 bg-light">
+    <div class="container">
+        <h1 class="display-3">Bienvenido <strong>   {{ session["usuarioA"]}} </strong></h1>
+        <p class="lead">Aqui podrá administrar los usuarios, habitaciones y comentarios del sitio web</p>
+        <hr class=""my-2>
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="/habitaciones" role="button"> Empezar Gestión</a>
+        </p>
+    </div>
+</div>
+
+{% include 'admin/pie.html' %}

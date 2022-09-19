@@ -1,0 +1,20 @@
+{% include 'user/cabecera.html' %}
+
+    <div class="row ">
+        {% for post in posts %}
+        <div class="col-md-3">
+            <div class="card">
+                <img class="card-img-top" src="/user/img/{{post[1]}}" alt="Title">
+                <div class="card-body">
+                    <p class="card-text">{{post[2]}}</p>
+                    <p class="card-text">Fecha de Publicación: {{post[3]}}</p>
+                    <a name="" id="" class="btn btn-primary" href="#" role="button">Editar</a>
+                    <a name="" id="" class="btn btn-danger" href="#" role="button">Eliminar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+{% include 'user/pie.html' %}

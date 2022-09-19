@@ -1,0 +1,82 @@
+{% include 'admin/cabecera.html' %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+
+            <div class="card">
+                <div class="card-header">
+                    Datos de la Habitación
+                </div>
+
+                <div class="card-body">
+                    <form action="/admin/habitaciones/guardar" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label for="txtNombre" class="form-label">Nombre Habitación</label>
+                            <input type="text" class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre de la habitación">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtImagen" class="form-label">Imagen:</label>
+                             <input type="file" class="form-control" name="txtImagen" id="txtImagen" aria-describedby="helpId" placeholder="Seleccione la imagen">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtDescripcion" class="form-label">Descipcion:</label>
+                            <input type="text" class="form-control" name="txtDescripcion" id="txtDescripcion" aria-describedby="helpId" placeholder="Escriba la descripción de la habitación">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+
+                    </form>
+                </div>
+                <div class="card-footer text-muted">
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-7">
+
+
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Imagen</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for habitacion in habitaciones %}
+                        <tr class=""></tr>
+                            <td>{{habitacion[0]}}</td>
+                            <td>{{habitacion[1]}}</td>
+                            <td>
+                                <img width="60" src="/img/{{habitacion[2]}}" class="img-fluid rounded-top" alt="">
+                            </td>
+                            <td>{{habitacion[3]}}</td>
+                            <td>
+                                <form action="/admin/habitaciones/borrar" method="post">
+                                    <input value="{{habitacion[0]}}" type="hidden" name="txtID" id="txtID">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+
+                </table>
+
+        </div>
+
+    </div>
+</div>
+
+
+{% include 'admin/pie.html' %}

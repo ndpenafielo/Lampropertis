@@ -1,0 +1,14 @@
+ {% include 'user/cabecera.html' %}
+
+ <div class="p-5 bg-light">
+    <div class="container">
+        <h1 class="display-3">Bienvenido <strong>    {{ session["usuarioF"]}} </strong></h1>
+        <p class="lead">Aqui podrás publicar los post que desees</p>
+        <hr class=""my-2>
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="/user/posts" role="button"> Ver Posts</a>
+        </p>
+    </div>
+</div>
+
+{% include 'user/pie.html' %}

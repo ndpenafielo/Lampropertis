@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Login del Admin</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.0-beta1 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+    integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-4">
+                <br>
+                {% if mensaje %}
+                <div class="alert alert-danger" role="alert">
+                  <strong>{{mensaje}}</strong> Usuario y/o contraseña Incorrectos
+                </div>
+                {% endif %}
+
+                <div class="card">
+                    <div class="card-header">
+                        Inicio de Sesión como Administrador
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/login" method="post">
+
+                            <div class="mb-3">
+                              <label for="txtUsuario" class="form-label">Usuario</label>
+                              <input type="text" class="form-control" name="txtUsuario" id="txtUsuario" aria-describedby="helpId" placeholder="Escriba su usuario">
+                            </div>
+
+                            <div class="mb-3">
+                              <label for="txtPassword" class="form-label">Contraseña: </label>
+                              <input type="password" class="form-control" name="txtPassword" id="txtPassword" aria-describedby="helpId" placeholder="Escriba su contraseña">
+                            </div>
+
+
+                            <div class="row ">
+                              <div class="col-md-3">
+
+                              </div>
+                              <div class="col-md-3">
+                                <button type="submit" class="btn btn-success">Login</button>
+                              </div>
+                              <div class="col-md-3">
+                                <a name="" id="" class="btn btn-primary" href="/" role="button">Volver</a>
+                              </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="card-footer text-muted">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+
+            </div>
+
+        </div>
+    </div>
+
+  <header>
+    <!-- place navbar here -->
+  </header>
+  <main>
+
+  </main>
+  <footer>
+    <!-- place footer here -->
+  </footer>
+  <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
+    integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js"
+    integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
