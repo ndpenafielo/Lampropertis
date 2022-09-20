@@ -8,15 +8,41 @@ from flaskext.mysql import MySQL
 from datetime import datetime
 from flask import send_from_directory
 
+
 app=Flask(__name__)
 app.secret_key="llave"
 mysql = MySQL()
+
+#    Configuración de MYSQL para base de datos
 
 app.config['MYSQL_DATABASE_HOST']='localhost'
 app.config['MYSQL_DATABASE_USER']='root'
 app.config['MYSQL_DATABASE_PASSWORD']=''
 app.config['MYSQL_DATABASE_DB']='sitio'
 mysql.init_app(app)
+
+#    Directorios de imagenes
+
+@app.route('/img/<imagen>')
+def imagenes(imagen):
+    return send_from_directory(os.path.join('templates/sitio/img/'),imagen)
+
+@app.route('/user/userPosts/<usuario>/<imagen>')
+def user_imagenes(usuario,imagen):
+    directorio = usuario+"/"+imagen
+    return send_from_directory(os.path.join('templates/user/userPosts/'),directorio)
+
+#    Directorios de archivos CSS
+
+@app.route("/sitio/css/<archivocss>")
+def sitio_css_link(archivocss):
+    return send_from_directory(os.path.join('templates/sitio/css/'),archivocss)
+
+@app.route("/user/css/<archivocss>")
+def user_css_link(archivocss):
+    return send_from_directory(os.path.join('templates/user/css/'),archivocss)
+
+#    Directorios de sitio
 
 @app.route('/')
 def inicio():
@@ -25,15 +51,6 @@ def inicio():
 @app.route('/nosotros')
 def nosotros():
     return render_template('sitio/nosotros.html')
-
-@app.route('/img/<imagen>')
-def imagenes(imagen):
-    print(imagen)
-    return send_from_directory(os.path.join('templates/sitio/img/'),imagen)
-
-@app.route("/css/<archivocss>")
-def css_link(archivocss):
-    return send_from_directory(os.path.join('templates/sitio/css/'),archivocss)
 
 @app.route('/registro')
 def user_registro():
@@ -49,6 +66,10 @@ def user_registrar_nuevo():
     _password1 = request.form['txtPassword']
     _password2 = request.form['txtPassword2']
 
+    directorio = "templates/user/userPosts/"+_usuario
+    if not os.path.exists(directorio):
+        os.makedirs(directorio)
+
     tiempo = datetime.now()
     horaActual1=tiempo.strftime('%X %x')
 
@@ -61,6 +82,8 @@ def user_registrar_nuevo():
     conexion.commit()
 
     return redirect("/user/login")
+
+#    Directorios de usuario
 
 @app.route('/user/')
 def user_index():
@@ -81,14 +104,14 @@ def user_login_post():
 
     conexion=mysql.connect()
     cursor=conexion.cursor()
-    cursor.execute("SELECT password FROM `usuariosfinales` WHERE email=%s",_email)
-    password=cursor.fetchall()
+    cursor.execute("SELECT password,user FROM `usuariosfinales` WHERE email=%s",_email)
+    usuario=cursor.fetchall()
     conexion.commit()
 
     if cursor.rowcount !=0 :
-        if _password == password[0][0]:
+        if _password == usuario[0][0]:
             session["loginF"]=True
-            session["usuarioF"]=_email
+            session["usuarioF"]=usuario[0][1]
             return redirect("/user")
 
     return render_template('user/login.html', mensaje="Acceso denegado:")
@@ -105,7 +128,7 @@ def verPosts():
         return redirect("/user/login")
     conexion=mysql.connect()
     cursor=conexion.cursor()
-    cursor.execute("SELECT * FROM `posts`")
+    cursor.execute("SELECT * FROM `posts` WHERE user=%s",session["usuarioF"])
     posts=cursor.fetchall()
     conexion.commit()
 
@@ -115,13 +138,7 @@ def verPosts():
 def user_crearPost():
     if not 'loginF' in session:
         return redirect("/user/login")
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT * FROM `posts`")
-    posts=cursor.fetchall()
-    conexion.commit()
-
-    return render_template('user/crearPost.html', posts=posts)
+    return render_template('user/crearPost.html')
 
 @app.route('/user/post/guardar',methods=['POST'])
 def user_post_guardar():
@@ -139,10 +156,10 @@ def user_post_guardar():
 
     if _archivo.filename!="":
         nuevoNombre=horaActual+"_"+_usuario +".jpg"
-        _archivo.save("templates/user/img/"+nuevoNombre)
+        _archivo.save("templates/user/userPosts/" +_usuario +"/" + nuevoNombre)
 
-    sql="INSERT INTO `posts` (`id`, `imagen`, `descripcion`, `fecha`) VALUES (NULL, %s, %s, %s);"
-    datos=(nuevoNombre,_descripcion,horaActual2)
+    sql="INSERT INTO `posts` (`id`, `imagen`, `descripcion`, `fecha`, `user`) VALUES (NULL, %s, %s, %s, %s);"
+    datos=(nuevoNombre,_descripcion,horaActual2, _usuario)
 
     conexion = mysql.connect()
     cursor=conexion.cursor()
@@ -151,10 +168,30 @@ def user_post_guardar():
 
     return redirect('/user/posts')
 
-@app.route('/user/img/<imagen>')
-def user_imagenes(imagen):
-    print(imagen)
-    return send_from_directory(os.path.join('templates/user/img/'),imagen)
+@app.route('/user/post/borrar',methods=['POST'])
+def user_post_borrar():
+
+    if not 'loginF' in session:
+        return redirect("/user/login")
+    _id=request.form['txtID']
+
+    conexion=mysql.connect()
+    cursor=conexion.cursor()
+    cursor.execute("SELECT imagen,user FROM `posts` WHERE id=%s",_id)
+    posts=cursor.fetchall()
+    conexion.commit()
+
+    if os.path.exists("templates/user/userPosts/"+str(posts[0][1])+"/"+str(posts[0][0])):
+        os.unlink("templates/user/userPosts/"+str(posts[0][1])+"/"+str(posts[0][0]))
+
+    conexion=mysql.connect()
+    cursor=conexion.cursor()
+    cursor.execute("DELETE FROM `posts` WHERE id=%s",_id)
+    conexion.commit()
+
+    return redirect('/user/posts')
+
+#   Directorio de Admin
 
 @app.route('/admin/')
 def admin_index():

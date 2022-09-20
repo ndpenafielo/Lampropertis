@@ -4,12 +4,24 @@
         {% for post in posts %}
         <div class="col-md-3">
             <div class="card">
-                <img class="card-img-top" src="/user/img/{{post[1]}}" alt="Title">
+                <img class="card-img-top" src="/user/userPosts/{{post[4]}}/{{post[1]}}" alt="Title">
                 <div class="card-body">
                     <p class="card-text">{{post[2]}}</p>
                     <p class="card-text">Fecha de Publicación: {{post[3]}}</p>
-                    <a name="" id="" class="btn btn-primary" href="#" role="button">Editar</a>
-                    <a name="" id="" class="btn btn-danger" href="#" role="button">Eliminar</a>
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <form action="/user/post/borrar" method="post">
+                                <input value="{{post[0]}}" type="hidden" name="txtID" id="txtID">
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form action="/user/post/editar" method="post">
+                                <input value="{{post[0]}}" type="hidden" name="txtID" id="txtID">
+                                <button type="submit" class="btn btn-warning">Editar</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
