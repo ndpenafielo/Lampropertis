@@ -1,0 +1,73 @@
+{% include 'admin/cabecera.html' %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+            <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                <form action="/admin/posts/buscar" method="post" class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" name="txtBuscar" id="txtBuscar" placeholder="Buscar por usuario" aria-label="Search" required>
+                  <button class="btn btn-primary" type="submit">Buscar</button>
+                  <a class="btn btn-info" href="/admin/posts">Limpiar</a>
+                </form>
+              </ul>
+        </div>
+        <div class="col-md-4">
+        </div>
+    </div>
+</div>
+
+<li><hr class="dropdown-divider"></li>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-8">
+
+
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Imagen</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                        <tr class=""></tr>
+                            <td>{{post[4]}}</td>
+                            <td>
+                                <img width="60" src="/user/userPosts/{{post[4]}}/{{post[1]}}" class="img-fluid rounded-top" alt="">
+                            </td>
+                            <td>{{post[2]}}</td>
+                            <td>{{post[3]}}</td>
+                            <td>
+                                <form action="/admin/posts/borrar" method="post">
+                                    <input value="{{post[0]}}" type="hidden" name="txtUser" id="txtUser">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                                <form action="/admin/posts/editar" method="post">
+                                    <input value="{{post[0]}}" type="hidden" name="txtUser" id="txtUser">
+                                    <button type="submit" class="btn btn-warning">Editar</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+
+                </table>
+
+        </div>
+
+    </div>
+</div>
+
+
+{% include 'admin/pie.html' %}

@@ -4,7 +4,6 @@ from os import curdir
 import os
 from flask import Flask
 from flask import render_template, request, redirect, session
-from flaskext.mysql import MySQL
 from datetime import datetime
 from flask import send_from_directory
 import sqlite3
@@ -12,7 +11,6 @@ import sqlite3
 
 app=Flask(__name__)
 app.secret_key="llave"
-mysql = MySQL()
 con = sqlite3.connect('templates/db/sitio.db', check_same_thread=False)
 
 #    Directorios de imagenes
@@ -300,6 +298,33 @@ def admin_usuariosfinales_buscar():
     usuarios=cursor.fetchall()
 
     return render_template('admin/usuariosFinales.html', usuarios=usuarios)
+
+@app.route('/admin/posts')
+def admin_posts():
+    if not 'loginA' in session:
+        return redirect("/admin/login")
+
+    sql="SELECT * FROM posts"
+    cursor=con.cursor()
+    cursor.execute(sql)
+    posts=cursor.fetchall()
+
+    return render_template('admin/posts.html', posts=posts)
+
+@app.route('/admin/posts/buscar',methods=['POST'])
+def admin_posts_buscar():
+
+    if not 'loginA' in session:
+        return redirect("/admin/login")
+
+    _user=request.form['txtBuscar']
+
+    sql="SELECT * FROM posts WHERE user=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_user,))
+    posts=cursor.fetchall()
+
+    return render_template('admin/posts.html', posts=posts)
 
 
 if __name__=='__main__':
