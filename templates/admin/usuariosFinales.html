@@ -1,0 +1,121 @@
+{% include 'admin/cabecera.html' %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+            <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                <form action="/admin/usuariosFinales/buscar" method="post" class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" name="txtBuscar" id="txtBuscar" placeholder="Buscar por usuario" aria-label="Search" required>
+                  <button class="btn btn-primary" type="submit">Buscar</button>
+                  <a class="btn btn-info" href="/admin/usuariosFinales">Limpiar</a>
+                </form>
+              </ul>
+        </div>
+        <div class="col-md-4">
+        </div>
+    </div>
+</div>
+
+<li><hr class="dropdown-divider"></li>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+
+            <div class="card">
+                <div class="card-header">
+                    Agregar Usuario Finales
+                </div>
+
+                <div class="card-body">
+                    <form action="/admin/usuariosFinales/agregar" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label for="txtUsuario" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" name="txtUsuario" id="txtUsuario" aria-describedby="helpId" placeholder="Escriba el usuario a agregar">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="txtPassword" id="txtPassword" aria-describedby="helpId" placeholder="Escriba el password">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtNombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del Usuario">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtCorreo" class="form-label">Correo</label>
+                            <input type="text" class="form-control" name="txtCorreo" id="txtCorreo" aria-describedby="helpId" placeholder="Escriba el correo">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtTelefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="txtTelefono" id="txtTelefono" aria-describedby="helpId" placeholder="Escriba el teléfono">
+                        </div>
+
+
+
+                    </form>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col-md-4">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-8">
+
+
+                <table class="table table-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Correo</th>
+                            <th scope="col">Telefono</th>
+                            <th scope="col">Fecha de Alta</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr class=""></tr>
+                            <td>{{usuario[0]}}</td>
+                            <td>{{usuario[1]}}</td>
+                            <td>{{usuario[2]}}</td>
+                            <td>{{usuario[3]}}</td>
+                            <td>{{usuario[5]}}</td>
+                            <td>
+                                <form action="/admin/usuariosFinales/borrar" method="post">
+                                    <input value="{{usuario[0]}}" type="hidden" name="txtUser" id="txtUser">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                                <form action="/admin/usuariosFinales/editar" method="post">
+                                    <input value="{{usuario[0]}}" type="hidden" name="txtUser" id="txtUser">
+                                    <button type="submit" class="btn btn-warning">Editar</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+
+                </table>
+
+        </div>
+
+    </div>
+</div>
+
+
+{% include 'admin/pie.html' %}

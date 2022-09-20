@@ -7,19 +7,13 @@ from flask import render_template, request, redirect, session
 from flaskext.mysql import MySQL
 from datetime import datetime
 from flask import send_from_directory
+import sqlite3
 
 
 app=Flask(__name__)
 app.secret_key="llave"
 mysql = MySQL()
-
-#    Configuración de MYSQL para base de datos
-
-app.config['MYSQL_DATABASE_HOST']='localhost'
-app.config['MYSQL_DATABASE_USER']='root'
-app.config['MYSQL_DATABASE_PASSWORD']=''
-app.config['MYSQL_DATABASE_DB']='sitio'
-mysql.init_app(app)
+con = sqlite3.connect('templates/db/sitio.db', check_same_thread=False)
 
 #    Directorios de imagenes
 
@@ -73,13 +67,12 @@ def user_registrar_nuevo():
     tiempo = datetime.now()
     horaActual1=tiempo.strftime('%X %x')
 
-    sql="INSERT INTO `usuariosfinales` (`user`, `nombre`, `email`, `telefono`, `password`, `fecha`) VALUES (%s, %s, %s, %s, %s, %s);"
+    sql='''INSERT INTO usuariosfinales (user, nombre, email, telefono, password, fecha) VALUES (?, ?, ?, ?, ?, ?)'''
     datos=(_usuario,_nombre,_email,_telefono,_password1,horaActual1)
 
-    conexion = mysql.connect()
-    cursor=conexion.cursor()
+    cursor=con.cursor()
     cursor.execute(sql,datos)
-    conexion.commit()
+    con.commit()
 
     return redirect("/user/login")
 
@@ -102,13 +95,12 @@ def user_login_post():
     _email=request.form['txtUsuario']
     _password=request.form['txtPassword']
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT password,user FROM `usuariosfinales` WHERE email=%s",_email)
+    sql="SELECT password,user FROM usuariosfinales WHERE email=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_email,))
     usuario=cursor.fetchall()
-    conexion.commit()
 
-    if cursor.rowcount !=0 :
+    if usuario:
         if _password == usuario[0][0]:
             session["loginF"]=True
             session["usuarioF"]=usuario[0][1]
@@ -126,11 +118,11 @@ def user_login_cerrar():
 def verPosts():
     if not 'loginF' in session:
         return redirect("/user/login")
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT * FROM `posts` WHERE user=%s",session["usuarioF"])
+
+    sql="SELECT * FROM posts WHERE user=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(session["usuarioF"],))
     posts=cursor.fetchall()
-    conexion.commit()
 
     return render_template('user/posts.html', posts=posts)
 
@@ -151,20 +143,20 @@ def user_post_guardar():
     _archivo = request.files['txtImagen']
 
     tiempo = datetime.now()
-    horaActual=tiempo.strftime('%Y%m%d%H%M')
+    horaActual=tiempo.strftime('%Y%m%d%H%M%S')
     horaActual2=tiempo.strftime('%X %x')
 
     if _archivo.filename!="":
         nuevoNombre=horaActual+"_"+_usuario +".jpg"
         _archivo.save("templates/user/userPosts/" +_usuario +"/" + nuevoNombre)
 
-    sql="INSERT INTO `posts` (`id`, `imagen`, `descripcion`, `fecha`, `user`) VALUES (NULL, %s, %s, %s, %s);"
+
+    sql='''INSERT INTO posts (id, imagen, descripcion, fecha, user) VALUES (NULL,?, ?, ?, ?)'''
     datos=(nuevoNombre,_descripcion,horaActual2, _usuario)
 
-    conexion = mysql.connect()
-    cursor=conexion.cursor()
+    cursor=con.cursor()
     cursor.execute(sql,datos)
-    conexion.commit()
+    con.commit()
 
     return redirect('/user/posts')
 
@@ -175,19 +167,19 @@ def user_post_borrar():
         return redirect("/user/login")
     _id=request.form['txtID']
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT imagen,user FROM `posts` WHERE id=%s",_id)
+    sql="SELECT imagen,user FROM posts WHERE id=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_id,))
     posts=cursor.fetchall()
-    conexion.commit()
 
     if os.path.exists("templates/user/userPosts/"+str(posts[0][1])+"/"+str(posts[0][0])):
         os.unlink("templates/user/userPosts/"+str(posts[0][1])+"/"+str(posts[0][0]))
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("DELETE FROM `posts` WHERE id=%s",_id)
-    conexion.commit()
+
+    sql="DELETE FROM posts WHERE id=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_id,))
+    con.commit()
 
     return redirect('/user/posts')
 
@@ -210,13 +202,12 @@ def admin_login_post():
     _usuario=request.form['txtUsuario']
     _password=request.form['txtPassword']
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT password FROM `usuariosadmin` WHERE usuario=%s",_usuario)
+    sql="SELECT password FROM usuariosadmin WHERE usuario=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_usuario,))
     password=cursor.fetchall()
-    conexion.commit()
 
-    if cursor.rowcount !=0 :
+    if password:
         if _password == password[0][0]:
             session["loginA"]=True
             session["usuarioA"]=_usuario
@@ -231,69 +222,84 @@ def admin_login_cerrar():
     return redirect('/admin/login')
 
 
-@app.route('/admin/habitaciones')
-def admin_habitaciones():
-    if not 'loginA' in session:
-        return redirect("/admin/login")
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT * FROM `habitaciones`")
-    habitaciones=cursor.fetchall()
-    conexion.commit()
-
-    return render_template('admin/habitaciones.html', habitaciones=habitaciones)
-
-@app.route('/admin/habitaciones/guardar',methods=['POST'])
-def admin_habitaciones_guardar():
-
+@app.route('/admin/usuariosFinales')
+def admin_usuarios_finales():
     if not 'loginA' in session:
         return redirect("/admin/login")
 
+    sql="SELECT * FROM usuariosfinales"
+    cursor=con.cursor()
+    cursor.execute(sql)
+    usuarios=cursor.fetchall()
+
+    return render_template('admin/usuariosFinales.html', usuarios=usuarios)
+
+@app.route('/admin/usuariosFinales/agregar',methods=['POST'])
+def admin_usuariosFinales_guardar():
+
+    if not 'loginA' in session:
+        return redirect("/admin/login")
+
+    _usuario = request.form['txtUsuario']
     _nombre = request.form['txtNombre']
-    _descripcion = request.form['txtDescripcion']
-    _archivo = request.files['txtImagen']
+    _password = request.form['txtPassword']
+    _correo = request.form['txtCorreo']
+    _telefono = request.form['txtTelefono']
 
     tiempo = datetime.now()
-    horaActual=tiempo.strftime('%Y%H%M%S')
+    _fecha=tiempo.strftime('%X %x')
 
-    if _archivo.filename!="":
-        nuevoNombre=horaActual+"_"+_archivo.filename
-        _archivo.save("templates/sitio/img/"+nuevoNombre)
+    directorio = "templates/user/userPosts/"+_usuario
+    if not os.path.exists(directorio):
+        os.makedirs(directorio)
 
-    sql="INSERT INTO `habitaciones` (`id`, `nombre`, `imagen`, `descripcion`) VALUES (NULL, %s, %s, %s);"
-    datos=(_nombre,nuevoNombre,_descripcion)
+    tiempo = datetime.now()
+    horaActual=tiempo.strftime('%X %x')
 
-    conexion = mysql.connect()
-    cursor=conexion.cursor()
+    sql='''INSERT INTO usuariosfinales (user, nombre, email, telefono, password, fecha) VALUES (?, ?, ?, ?, ?, ?)'''
+    datos=(_usuario,_nombre,_correo,_telefono,_password,horaActual)
+
+    cursor=con.cursor()
     cursor.execute(sql,datos)
-    conexion.commit()
+    con.commit()
 
-    return redirect('/admin/habitaciones')
+    return redirect('/admin/usuariosFinales')
 
-@app.route('/admin/habitaciones/borrar',methods=['POST'])
-def admin_habitaciones_borrar():
+@app.route('/admin/usuariosFinales/borrar',methods=['POST'])
+def admin_usuariosfinales_borrar():
 
     if not 'loginA' in session:
         return redirect("/admin/login")
 
-    _id=request.form['txtID']
+    _user=request.form['txtUser']
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("SELECT imagen FROM `habitaciones` WHERE id=%s",_id)
-    habitacion=cursor.fetchall()
-    conexion.commit()
+    """ para borrar carpeta donde guardan post, marca permiso denegado
+    if os.path.exists("templates/user/userPosts/"+_user):
+        os.unlink("templates/user/userPosts/"+_user)
+    """
 
-    if os.path.exists("templates/sitio/img/"+str(habitacion[0][0])):
-        os.unlink("templates/sitio/img/"+str(habitacion[0][0]))
+    sql="DELETE FROM usuariosfinales WHERE user=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_user,))
+    con.commit()
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute("DELETE FROM `habitaciones` WHERE id=%s",_id)
-    conexion.commit()
+    return redirect('/admin/usuariosFinales')
 
-    return redirect('/admin/habitaciones')
 
+@app.route('/admin/usuariosFinales/buscar',methods=['POST'])
+def admin_usuariosfinales_buscar():
+
+    if not 'loginA' in session:
+        return redirect("/admin/login")
+
+    _user=request.form['txtBuscar']
+
+    sql="SELECT * FROM usuariosfinales WHERE user=?"
+    cursor=con.cursor()
+    cursor.execute(sql,(_user,))
+    usuarios=cursor.fetchall()
+
+    return render_template('admin/usuariosFinales.html', usuarios=usuarios)
 
 
 if __name__=='__main__':
