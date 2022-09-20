@@ -35,27 +35,25 @@ def imagenes(imagen):
 def css_link(archivocss):
     return send_from_directory(os.path.join('templates/sitio/css/'),archivocss)
 
-@app.route('/registrarse')
+@app.route('/registro')
 def user_registro():
     return render_template('sitio/registro.html')
 
-@app.route('/registrarse',methods=['POST'])
+@app.route('/registro',methods=['POST'])
 def user_registrar_nuevo():
 
-    _usuario = session["usuarioF"]
-    _descripcion = request.form['txtDescripcion']
-    _archivo = request.files['txtImagen']
+    _nombre = request.form['txtNombre']
+    _usuario = request.form['txtUsuario']
+    _email = request.form['txtEmail']
+    _telefono = request.form['txtTelefono']
+    _password1 = request.form['txtPassword']
+    _password2 = request.form['txtPassword2']
 
     tiempo = datetime.now()
-    horaActual=tiempo.strftime('%Y%m%d%H%M')
-    horaActual2=tiempo.strftime('%X %x')
+    horaActual1=tiempo.strftime('%X %x')
 
-    if _archivo.filename!="":
-        nuevoNombre=horaActual+"_"+_usuario +".jpg"
-        _archivo.save("templates/user/img/"+nuevoNombre)
-
-    sql="INSERT INTO `posts` (`id`, `imagen`, `descripcion`, `fecha`) VALUES (NULL, %s, %s, %s);"
-    datos=(nuevoNombre,_descripcion,horaActual2)
+    sql="INSERT INTO `usuariosfinales` (`user`, `nombre`, `email`, `telefono`, `password`, `fecha`) VALUES (%s, %s, %s, %s, %s, %s);"
+    datos=(_usuario,_nombre,_email,_telefono,_password1,horaActual1)
 
     conexion = mysql.connect()
     cursor=conexion.cursor()
@@ -78,19 +76,19 @@ def user_login():
 
 @app.route('/user/login', methods=['POST'])
 def user_login_post():
-    _usuario=request.form['txtUsuario']
+    _email=request.form['txtUsuario']
     _password=request.form['txtPassword']
 
     conexion=mysql.connect()
     cursor=conexion.cursor()
-    cursor.execute("SELECT password FROM `usuariosuser` WHERE user=%s",_usuario)
+    cursor.execute("SELECT password FROM `usuariosfinales` WHERE email=%s",_email)
     password=cursor.fetchall()
     conexion.commit()
 
     if cursor.rowcount !=0 :
         if _password == password[0][0]:
             session["loginF"]=True
-            session["usuarioF"]=_usuario
+            session["usuarioF"]=_email
             return redirect("/user")
 
     return render_template('user/login.html', mensaje="Acceso denegado:")

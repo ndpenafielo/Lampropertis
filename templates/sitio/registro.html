@@ -1,73 +1,55 @@
 <!DOCTYPE html>
 
-<html lang="en" dir="ltr">
+<html>
   <head>
+    <title>Formulario de registro</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/register.css">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   </head>
+    <link rel="stylesheet" href="css/register.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/img/icon.png">
+  </head>
 <body>
+
   <div class="container">
-    <div class="title">Registration</div>
+    <div class="title">Registro Nuevo Usuario</div>
     <div class="content">
-      <form action="#">
+      <form action="/registro" method="post" name="formRegistro" id="formRegistro">
         <div class="user-details">
           <div class="input-box">
-            <span class="details">Full Name</span>
-            <input type="text" placeholder="Enter your name" required>
+            <span class="details">Nombre Completo</span>
+            <input type="text" name="txtNombre" id="txtNombre" placeholder="Escribe tu nombre completo" required>
           </div>
           <div class="input-box">
-            <span class="details">Username</span>
-            <input type="text" placeholder="Enter your username" required>
+            <span class="details">Usuario</span>
+            <input type="text" name="txtUsuario" id="txtUsuario" placeholder="Escribe tu usuario" required>
           </div>
           <div class="input-box">
             <span class="details">Email</span>
-            <input type="text" placeholder="Enter your email" required>
+            <input type="text" name="txtEmail" id="txtEmail" placeholder="Escribe tu email" required>
           </div>
           <div class="input-box">
-            <span class="details">Phone Number</span>
-            <input type="text" placeholder="Enter your number" required>
+            <span class="details">Número de Telefóno</span>
+            <input type="text" name="txtTelefono" id="txtTelefono" placeholder="Escribe tu número de telefono" required>
           </div>
           <div class="input-box">
             <span class="details">Password</span>
-            <input type="text" placeholder="Enter your password" required>
+            <input type="password" name="txtPassword" id="txtPassword" placeholder="Escribe tu password" required>
           </div>
           <div class="input-box">
-            <span class="details">Confirm Password</span>
-            <input type="text" placeholder="Confirm your password" required>
-          </div>
-        </div>
-        <div class="gender-details">
-          <input type="radio" name="gender" id="dot-1">
-          <input type="radio" name="gender" id="dot-2">
-          <input type="radio" name="gender" id="dot-3">
-          <span class="gender-title">Gender</span>
-          <div class="category">
-            <label for="dot-1">
-            <span class="dot one"></span>
-            <span class="gender">Male</span>
-          </label>
-          <label for="dot-2">
-            <span class="dot two"></span>
-            <span class="gender">Female</span>
-          </label>
-          <label for="dot-3">
-            <span class="dot three"></span>
-            <span class="gender">Prefer not to say</span>
-            </label>
+            <span class="details">Confirmar Password</span>
+            <input type="password" name="txtPassword2" id="txtPassword2" placeholder="Confirmar tu password" required>
           </div>
         </div>
         <div class="button">
-          <input type="submit" value="Register">
+          <input type="submit" value="Registro">
         </div>
         <div >
             <a name="" id="" href="/" role="button">Volver</a>
         </div>
-
-
       </form>
     </div>
   </div>
 
 </body>
 </html>
+
